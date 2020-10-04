@@ -245,6 +245,23 @@ void Automaton::make_full() {
     }
 }
 
+void Automaton::make_additional() {
+    make_deterministic();
+    make_full();
+
+    std::vector<bool> new_finish(v_size(), 1);
+    for (int v: _finishes) {
+        new_finish[v] = 0;
+    }
+    clear_finishes();
+
+    for (int v = 0; v < v_size(); ++v) {
+        if (new_finish[v]) {
+            add_finish(v);
+        }
+    }
+}
+
 void Automaton::_calc_buckets(std::vector<std::vector<int>> &t) {
     for (int i = 1; i < _sigma.size(); ++i) {
         char c = _sigma[i];
@@ -360,4 +377,41 @@ std::ostream& operator<<(std::ostream &out, const Vertex& v) {
         }
     }
     return out;
+}
+
+bool Automaton::is_same(Automaton other) const {
+    Automaton a = (*this);
+    a.make_deterministic();
+    a.make_full();
+    a.make_minimal();
+
+    other.make_deterministic();
+    other.make_full();
+    other.make_minimal();
+    other.make_additional();
+
+    std::map<std::pair<int, int>, bool> used;
+    std::queue<std::pair<int, int>> q;
+    q.push({a.get_start(), other.get_start()});
+    used[{a.get_start(), other.get_start()}] = true;
+
+    while (!q.empty()) {
+        auto cur = q.front();
+        q.pop();
+
+        int u = cur.first, v = cur.second;
+        if (a.is_finish(u) && other.is_finish(v)) {
+            return false;
+        }
+        for (int i = 1; i < _sigma.size(); ++i) {
+            char c = _sigma[i];
+            int u1 = a.get_next_Vertex(u, c)[0];
+            int v1 = other.get_next_Vertex(v, c)[0];
+            if (used.find({u1, v1}) == used.end()) {
+                used[{u1, v1}] = true;
+                q.push({u1, v1});
+            }
+        }
+    }
+    return true;
 }

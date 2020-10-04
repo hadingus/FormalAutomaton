@@ -76,8 +76,10 @@ public:
 
     void make_deterministic();
     void make_full();
+    void make_additional();
     void make_minimal();
     bool has_word(const std::string &s) const;
+    bool is_same(Automaton other) const;
 };
 
 //input and output
