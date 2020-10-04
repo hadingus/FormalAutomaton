@@ -8,3 +8,6 @@ add_subdirectory(automaton_src)
 
 add_executable(CTestsExe main_test.cpp gtests/tests.cpp)
 target_link_libraries(CTestsExe ${GTEST_LIBRARIES} AutomatonLib)
+
+add_executable(MainExe main.cpp)
+target_link_libraries(MainExe AutomatonLib)
