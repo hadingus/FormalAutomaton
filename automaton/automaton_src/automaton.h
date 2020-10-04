@@ -55,13 +55,15 @@ public:
     Automaton& operator=(const Automaton& other);
     void add_Vertex(int v);
     void add_edge(int from, char c, int to);
+    void add_finish(int s);
     void set_sigma(const std::string &str);
     void set_start(int start);
-    void add_finish(int s);
+
     std::set<int> get_finishes() const;
     int get_start() const;
     std::string get_sigma() const;
     std::vector<int> get_next_Vertex(int from, char c) const;
+
     size_t v_size() const;
     size_t ed_size() const;
     bool is_finish(int f) const;
@@ -80,10 +82,8 @@ public:
 
 //input and output
 
-
 std::ostream& operator<<(std::ostream &out, const Automaton &a);
 std::ostream& operator<<(std::ostream &out, const Vertex& v);
-
 std::istream& operator>>(std::istream &in, Automaton& a);
 
 /*

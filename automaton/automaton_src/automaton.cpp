@@ -53,7 +53,10 @@ Vertex::const_iterator Vertex::end() const {
 }
 
 Automaton::Automaton(): _edges(0), _start(-1) {}
-Automaton::Automaton(const std::string &sig, int _start): _edges(0), _sigma(sig), _start(_start) {}
+Automaton::Automaton(const std::string &sig, int _start): _edges(0), _sigma(sig), _start(_start) {
+    add_Vertex(_start);
+}
+
 Automaton::Automaton(const Automaton& other): _start(other._start), _finishes(other._finishes),
                                    _graph(other._graph), _edges(other._edges), _sigma(other._sigma) {}
 
@@ -99,6 +102,7 @@ size_t Automaton::ed_size() const {
 
 void Automaton::set_start(int start) {
     _start = start;
+    add_Vertex(_start);
 }
 
 int Automaton::get_start() const {
@@ -110,6 +114,7 @@ void Automaton::clear_finishes() {
 }
 
 void Automaton::add_finish(int s) {
+    add_Vertex(s);
     _finishes.insert(s);
 }
 
