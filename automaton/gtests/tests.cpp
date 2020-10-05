@@ -22,8 +22,6 @@ TEST(VertexTest, SimpleTest) {
 TEST(AutomatonTest, SigmaTest) {
     Automaton a("1abc", 0);
     EXPECT_EQ(a.get_sigma(), "1abc");
-    a.set_sigma("1frd");
-    EXPECT_EQ(a.get_sigma(), "1frd");
 }
 
 TEST(AutomatonTest, AddingVertices) {
@@ -133,7 +131,7 @@ TEST(AutomatonTest, CheckDeterminisation) {
     EXPECT_EQ(a.has_word("aaab"), false);
 }
 
-TEST(AutomatonTest, CheckFullAndAdditional) {
+TEST(AutomatonTest, CheckCompleteAndAdditional) {
     Automaton a("1ab", 0);
     a.add_edge(0, 'a', 1);
     a.add_edge(1, 'b', 2);
@@ -155,7 +153,7 @@ TEST(AutomatonTest, CheckFullAndAdditional) {
     a.add_terminal(6);
 
     a.make_deterministic();
-    a.make_full();
+    a.make_complete();
     a.make_complement();
 
     for (int v = 0; v < a.v_size(); ++v) {
@@ -200,7 +198,7 @@ TEST(AutomatonTest, CheckMinimalTest1) {
     a.add_terminal(8);
 
     a.make_deterministic();
-    a.make_full();
+    a.make_complete();
     a.make_minimal();
 
     EXPECT_EQ(a.v_size(), 3);
@@ -240,7 +238,7 @@ TEST(AutomatonTest, CheckMinimalTest2) {
     a.add_terminal(6);
 
     a.make_deterministic();
-    a.make_full();
+    a.make_complete();
     a.make_minimal();
 
     EXPECT_EQ(a.v_size(), 5);

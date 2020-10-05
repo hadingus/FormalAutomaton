@@ -10,9 +10,11 @@ Vertex::Vertex(const Vertex& other): _connected_vertices(other._connected_vertic
                              _id(other._id) {}
 
 Vertex& Vertex::operator=(const Vertex& other) {
-    _connected_vertices.clear();
-    _id = other._id;
-    _connected_vertices = other._connected_vertices;
+    if (&other != this) {
+        _connected_vertices.clear();
+        _id = other._id;
+        _connected_vertices = other._connected_vertices;
+    }
     return *this;
 }
 
@@ -73,7 +75,7 @@ Automaton& Automaton::operator=(const Automaton& other) {
 
 void Automaton::add_vertex(int v) {
     if (_graph.find(v) == _graph.end()) {
-        _graph[v] = Vertex(v);
+        _graph.emplace(v, Vertex(v));
     }
 }
 
@@ -82,10 +84,6 @@ void Automaton::add_edge(int from, char c, int to) {
     add_vertex(to);
     _graph[from].add_edge(c, to);
     ++_edges;
-}
-
-void Automaton::set_sigma(const std::string &str) {
-    _sigma = str;
 }
 
 std::string Automaton::get_sigma() const {
@@ -220,7 +218,7 @@ void Automaton::make_deterministic() {
     *this = result;
 }
 
-void Automaton::make_full() {
+void Automaton::make_complete() {
     int sz = v_size();
     int new_edges = 0;
     bool connection_got = false;
@@ -247,7 +245,7 @@ void Automaton::make_full() {
 
 void Automaton::make_complement() {
     make_deterministic();
-    make_full();
+    make_complete();
 
     std::vector<bool> new_terminal(v_size(), true);
     for (int v: _terminals) {
@@ -337,9 +335,9 @@ std::ostream& operator<<(std::ostream &out, const Automaton &a) {
 }
 
 std::istream& operator>>(std::istream &in, Automaton& a) {
-    std::string S;
-    in >> S;
-    a.set_sigma(S);
+    std::string sig;
+    in >> sig;
+    a._sigma = sig;
     size_t n;
     in >> n;
     int from, to;
@@ -382,11 +380,11 @@ std::ostream& operator<<(std::ostream &out, const Vertex& v) {
 bool Automaton::is_same(Automaton other) const {
     Automaton a = (*this);
     a.make_deterministic();
-    a.make_full();
+    a.make_complete();
     a.make_minimal();
 
     other.make_deterministic();
-    other.make_full();
+    other.make_complete();
     other.make_minimal();
     other.make_complement();
 

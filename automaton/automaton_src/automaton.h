@@ -33,6 +33,8 @@ public:
     iterator end();
     const_iterator begin() const;
     const_iterator end() const;
+
+    friend std::ostream& operator<<(std::ostream &out, const Vertex& v);
 };
 
 class Automaton {
@@ -56,7 +58,6 @@ public:
     void add_vertex(int v);
     void add_edge(int from, char c, int to);
     void add_terminal(int s);
-    void set_sigma(const std::string &str);
     void set_start(int start);
 
     std::set<int> get_terminals() const;
@@ -75,18 +76,15 @@ public:
     const_iterator end() const;
 
     void make_deterministic();
-    void make_full();
+    void make_complete();
     void make_complement();
     void make_minimal();
     bool has_word(const std::string &s) const;
     bool is_same(Automaton other) const;
+
+    friend std::ostream& operator<<(std::ostream &out, const Automaton &a);
+    friend std::istream& operator>>(std::istream &in, Automaton& a);
 };
-
-//input and output
-
-std::ostream& operator<<(std::ostream &out, const Automaton &a);
-std::ostream& operator<<(std::ostream &out, const Vertex& v);
-std::istream& operator>>(std::istream &in, Automaton& a);
 
 /*
  * sigma(starts from 1)
