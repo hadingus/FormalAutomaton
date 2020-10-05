@@ -13,3 +13,25 @@ Automat inputs in the following way:
 -Number of terminal vertices
 
 -All terminal vertices
+
+
+-----------------------------------------------
+
+## Launching:
+
+mkdir build
+
+cd build
+
+cmake ../ && make && ./MainExe
+
+
+-----------------------------------------------
+
+## Lauching tests:
+
+mkdir build
+
+cd build
+
+cmake ../ && make && ./CTestsExe
