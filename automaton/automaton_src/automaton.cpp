@@ -142,6 +142,9 @@ void Automaton::add_terminal(int s) {
 }
 
 std::vector<int> Automaton::get_next_vertex(int from, char c) const {
+    if (_graph.find(from) == _graph.end()) {
+        return {};
+    }
     return _graph.at(from).get_edge(c);
 }
 

@@ -395,3 +395,46 @@ TEST(AutomatonTest, CheckDeletingEpsTest2) {
 
     EXPECT_EQ(b.is_same(a), true);
 }
+
+TEST(AutomatonTest, CheckDeletingEpsTest3) {
+    Automaton a("1ab", 2), b("1ab", 3);
+    a.add_edge(2, 'a', 6);
+    a.add_edge(6, '1', 2);
+    a.add_edge(6, '1', 1);
+    a.add_edge(1, 'a', 0);
+    a.add_edge(0, 'b', 5);
+    a.add_edge(5, '1', 9);
+    a.add_edge(9, '1', 6);
+    a.add_edge(6, '1', 3);
+    a.add_edge(3, 'b', 8);
+    a.add_edge(8, 'b', 7);
+    a.add_edge(7, 'a', 8);
+    a.add_edge(8, 'a', 4);
+    a.add_edge(4, '1', 9);
+
+    a.add_terminal(2);
+
+    a.delete_eps();
+
+    b.add_edge(3, 'a', 1);
+    b.add_edge(1, 'a', 1);
+    b.add_edge(1, 'a', 0);
+    b.add_edge(0, 'b', 6);
+    b.add_edge(6, 'a', 0);
+    b.add_edge(6, 'a', 1);
+    b.add_edge(6, 'b', 4);
+    b.add_edge(5, 'a', 0);
+    b.add_edge(4, 'a', 5);
+    b.add_edge(5, 'b', 4);
+    b.add_edge(1, 'b', 4);
+    b.add_edge(4, 'b', 2);
+    b.add_edge(2, 'a', 4);
+    b.add_edge(5, 'a', 1);
+
+    b.add_terminal(3);
+    b.add_terminal(1);
+    b.add_terminal(5);
+    b.add_terminal(6);
+
+    EXPECT_EQ(b.is_same(a), true);
+}
