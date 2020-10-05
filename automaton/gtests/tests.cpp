@@ -283,6 +283,8 @@ TEST(AutomatonTest, CheckEqualutyTest1) {
 
     b.add_terminal(5);
 
+    bool res = a.is_same(b);
+
     EXPECT_EQ(a.is_same(b), true);
 }
 

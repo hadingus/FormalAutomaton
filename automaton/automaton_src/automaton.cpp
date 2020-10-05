@@ -380,12 +380,8 @@ std::ostream& operator<<(std::ostream &out, const Vertex& v) {
 
 bool Automaton::is_same(Automaton other) const {
     Automaton a = (*this);
-    a.make_deterministic();
-    a.make_complete();
     a.make_minimal();
 
-    other.make_deterministic();
-    other.make_complete();
     other.make_minimal();
     other.make_complement();
 
