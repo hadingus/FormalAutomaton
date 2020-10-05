@@ -16,6 +16,7 @@ class Vertex {
 private:
     std::map<char, std::set<int>> _connected_vertices;
     int _id;
+
 public:
     typedef typename std::map<char, std::set<int>>::iterator iterator;
     typedef typename std::map<char, std::set<int>>::const_iterator const_iterator;
@@ -25,9 +26,12 @@ public:
     Vertex(const Vertex& other);
     Vertex& operator=(const Vertex& other);
 
+    void delete_letter(char c);
     void add_edge(char c, int to);
+    void delete_edge(char c, int to);
     std::vector<int> get_edge(char c) const;
     int get_id() const;
+    int get_next_count(char c) const;
 
     iterator begin();
     iterator end();
@@ -46,6 +50,9 @@ class Automaton {
 
     void _calc_buckets(std::vector<std::vector<int>>&);
     bool _dfs(int v, const std::string &s, int pos) const;
+    void _reformat_dfs(int v, std::map<int, bool> &used) const;
+    void _reformat();
+    void _eps_dfs(int v, std::vector<int> &result, std::map<int, bool> &used);
 public:
     typedef typename std::map<int, Vertex>::iterator iterator;
     typedef typename std::map<int, Vertex>::const_iterator const_iterator;
@@ -70,11 +77,14 @@ public:
     bool is_terminal(int f) const;
     void clear_terminals();
 
+    void delete_edge(int from, char c, int to);
+
     iterator begin();
     iterator end();
     const_iterator begin() const;
     const_iterator end() const;
 
+    void delete_eps();
     void make_deterministic();
     void make_complete();
     void make_complement();
