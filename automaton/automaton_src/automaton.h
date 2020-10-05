@@ -91,7 +91,7 @@ std::istream& operator>>(std::istream &in, Automaton& a);
 /*
  * sigma(starts from 1)
  * number of edges
- * all edges if format (from, char, to)
+ * all edges in format (from, char, to)
  *
  * start Vertex
  * number of finish vertices
