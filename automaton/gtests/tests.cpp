@@ -30,11 +30,11 @@ TEST(AutomatonTest, AddingVertices) {
     Automaton a("1abc", 0);
 
     EXPECT_EQ(a.v_size(), 1);
-    a.add_Vertex(1);
-    a.add_Vertex(2);
-    a.add_Vertex(3);
+    a.add_vertex(1);
+    a.add_vertex(2);
+    a.add_vertex(3);
     EXPECT_EQ(a.v_size(), 4);
-    a.add_Vertex(2);
+    a.add_vertex(2);
     EXPECT_EQ(a.v_size(),4);
 
     a.set_start(10);
@@ -53,14 +53,14 @@ TEST(AutomatonTest, AddingEdges) {
     EXPECT_EQ(a.v_size(), 3);
     EXPECT_EQ(a.ed_size(), 3);
 
-    EXPECT_EQ(a.get_next_Vertex(0, 'a').size(), 1);
-    EXPECT_EQ(a.get_next_Vertex(0, 'a')[0], 1);
+    EXPECT_EQ(a.get_next_vertex(0, 'a').size(), 1);
+    EXPECT_EQ(a.get_next_vertex(0, 'a')[0], 1);
     a.add_edge(0, 'a', 3);
-    EXPECT_EQ(a.get_next_Vertex(0, 'a').size(), 2);
+    EXPECT_EQ(a.get_next_vertex(0, 'a').size(), 2);
 
     a.add_edge(0, 'a', 3);
-    EXPECT_EQ(a.get_next_Vertex(0, 'a').size(), 2);
-    EXPECT_EQ(a.get_next_Vertex(0, 'c').empty(), true);
+    EXPECT_EQ(a.get_next_vertex(0, 'a').size(), 2);
+    EXPECT_EQ(a.get_next_vertex(0, 'c').empty(), true);
 }
 
 TEST(AutomatonTest, AddingTerminal) {
@@ -119,8 +119,8 @@ TEST(AutomatonTest, CheckDeterminisation) {
     a.make_deterministic();
 
     for (int v = 0; v < a.v_size(); ++v) {
-        EXPECT_LE(a.get_next_Vertex(v, 'a').size(), 1);
-        EXPECT_LE(a.get_next_Vertex(v, 'b').size(), 1);
+        EXPECT_LE(a.get_next_vertex(v, 'a').size(), 1);
+        EXPECT_LE(a.get_next_vertex(v, 'b').size(), 1);
     }
 
     EXPECT_EQ(a.has_word("bba"), false);
@@ -156,11 +156,11 @@ TEST(AutomatonTest, CheckFullAndAdditional) {
 
     a.make_deterministic();
     a.make_full();
-    a.make_additional();
+    a.make_complement();
 
     for (int v = 0; v < a.v_size(); ++v) {
-        EXPECT_EQ(a.get_next_Vertex(v, 'a').size(), 1);
-        EXPECT_EQ(a.get_next_Vertex(v, 'b').size(), 1);
+        EXPECT_EQ(a.get_next_vertex(v, 'a').size(), 1);
+        EXPECT_EQ(a.get_next_vertex(v, 'b').size(), 1);
     }
 
     EXPECT_EQ(a.get_terminals().size(), 1);

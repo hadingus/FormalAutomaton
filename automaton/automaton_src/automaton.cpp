@@ -54,7 +54,7 @@ Vertex::const_iterator Vertex::end() const {
 
 Automaton::Automaton(): _edges(0), _start(-1) {}
 Automaton::Automaton(const std::string &sig, int _start): _edges(0), _sigma(sig), _start(_start) {
-    add_Vertex(_start);
+    add_vertex(_start);
 }
 
 Automaton::Automaton(const Automaton& other): _start(other._start), _terminals(other._terminals),
@@ -71,15 +71,15 @@ Automaton& Automaton::operator=(const Automaton& other) {
     return *this;
 }
 
-void Automaton::add_Vertex(int v) {
+void Automaton::add_vertex(int v) {
     if (_graph.find(v) == _graph.end()) {
         _graph[v] = Vertex(v);
     }
 }
 
 void Automaton::add_edge(int from, char c, int to) {
-    add_Vertex(from);
-    add_Vertex(to);
+    add_vertex(from);
+    add_vertex(to);
     _graph[from].add_edge(c, to);
     ++_edges;
 }
@@ -102,7 +102,7 @@ size_t Automaton::ed_size() const {
 
 void Automaton::set_start(int start) {
     _start = start;
-    add_Vertex(_start);
+    add_vertex(_start);
 }
 
 int Automaton::get_start() const {
@@ -114,11 +114,11 @@ void Automaton::clear_terminals() {
 }
 
 void Automaton::add_terminal(int s) {
-    add_Vertex(s);
+    add_vertex(s);
     _terminals.insert(s);
 }
 
-std::vector<int> Automaton::get_next_Vertex(int from, char c) const {
+std::vector<int> Automaton::get_next_vertex(int from, char c) const {
     return _graph.at(from).get_edge(c);
 }
 
@@ -150,7 +150,7 @@ bool Automaton::_dfs(int v, const std::string &s, int pos) const {
     if (pos == s.size()) {
         return is_terminal(v);
     }
-    auto next_verts = get_next_Vertex(v, s[pos]);
+    auto next_verts = get_next_vertex(v, s[pos]);
     bool good;
     for (auto u : next_verts) {
         good = _dfs(u, s, pos + 1);
@@ -193,7 +193,7 @@ void Automaton::make_deterministic() {
         for (auto c : get_sigma()) {
             std::set<int> nxt_set;
             for (auto v : vert_cort) {
-                auto next_verts = get_next_Vertex(v, c);
+                auto next_verts = get_next_vertex(v, c);
                 for (auto it : next_verts) {
                     nxt_set.insert(it);
                 }
@@ -224,12 +224,12 @@ void Automaton::make_full() {
     int sz = v_size();
     int new_edges = 0;
     bool connection_got = false;
-    add_Vertex(sz);
+    add_vertex(sz);
     for (const auto& it : _graph) {
         int v = it.first;
         for (int i = 1; i < _sigma.size(); ++i) {
             char c = _sigma[i];
-            auto connected_vertices = get_next_Vertex(v, c);
+            auto connected_vertices = get_next_vertex(v, c);
             if (connected_vertices.empty()) {
                 add_edge(v, c, sz);
                 ++new_edges;
@@ -245,13 +245,13 @@ void Automaton::make_full() {
     }
 }
 
-void Automaton::make_additional() {
+void Automaton::make_complement() {
     make_deterministic();
     make_full();
 
-    std::vector<bool> new_terminal(v_size(), 1);
+    std::vector<bool> new_terminal(v_size(), true);
     for (int v: _terminals) {
-        new_terminal[v] = 0;
+        new_terminal[v] = false;
     }
     clear_terminals();
 
@@ -266,7 +266,7 @@ void Automaton::_calc_buckets(std::vector<std::vector<int>> &t) {
     for (int i = 1; i < _sigma.size(); ++i) {
         char c = _sigma[i];
         for (int v = 0; v < v_size(); ++v) {
-            t[v][i] = t[get_next_Vertex(v, c)[0]][0];
+            t[v][i] = t[get_next_vertex(v, c)[0]][0];
         }
     }
 }
@@ -388,7 +388,7 @@ bool Automaton::is_same(Automaton other) const {
     other.make_deterministic();
     other.make_full();
     other.make_minimal();
-    other.make_additional();
+    other.make_complement();
 
     std::map<std::pair<int, int>, bool> used;
     std::queue<std::pair<int, int>> q;
@@ -405,8 +405,8 @@ bool Automaton::is_same(Automaton other) const {
         }
         for (int i = 1; i < _sigma.size(); ++i) {
             char c = _sigma[i];
-            int u1 = a.get_next_Vertex(u, c)[0];
-            int v1 = other.get_next_Vertex(v, c)[0];
+            int u1 = a.get_next_vertex(u, c)[0];
+            int v1 = other.get_next_vertex(v, c)[0];
             if (used.find({u1, v1}) == used.end()) {
                 used[{u1, v1}] = true;
                 q.push({u1, v1});

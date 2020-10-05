@@ -49,11 +49,11 @@ public:
     typedef typename std::map<int, Vertex>::const_iterator const_iterator;
 
     Automaton();
-    Automaton(const std::string &sig, int _start);
+    Automaton(const std::string &sig, int start);
     Automaton(const Automaton& other);
 
     Automaton& operator=(const Automaton& other);
-    void add_Vertex(int v);
+    void add_vertex(int v);
     void add_edge(int from, char c, int to);
     void add_terminal(int s);
     void set_sigma(const std::string &str);
@@ -62,7 +62,7 @@ public:
     std::set<int> get_terminals() const;
     int get_start() const;
     std::string get_sigma() const;
-    std::vector<int> get_next_Vertex(int from, char c) const;
+    std::vector<int> get_next_vertex(int from, char c) const;
 
     size_t v_size() const;
     size_t ed_size() const;
@@ -76,7 +76,7 @@ public:
 
     void make_deterministic();
     void make_full();
-    void make_additional();
+    void make_complement();
     void make_minimal();
     bool has_word(const std::string &s) const;
     bool is_same(Automaton other) const;
