@@ -328,7 +328,7 @@ std::ostream& operator<<(std::ostream &out, const Automaton &a) {
 
     out << "\nstart: " << a.get_start() << "\n";
     auto f = a.get_terminals();
-    out << ": ";
+    out << "terminals: ";
     for (auto i : f) {
         out << i << " ";
     }
