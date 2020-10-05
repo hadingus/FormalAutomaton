@@ -219,6 +219,7 @@ void Automaton::make_deterministic() {
 }
 
 void Automaton::make_complete() {
+    make_deterministic();
     int sz = v_size();
     int new_edges = 0;
     bool connection_got = false;
@@ -244,7 +245,6 @@ void Automaton::make_complete() {
 }
 
 void Automaton::make_complement() {
-    make_deterministic();
     make_complete();
 
     std::vector<bool> new_terminal(v_size(), true);
@@ -270,6 +270,7 @@ void Automaton::_calc_buckets(std::vector<std::vector<int>> &t) {
 }
 
 void Automaton::make_minimal() {
+    make_complete();
     std::vector<std::vector<int>> prev_bucket(v_size(), std::vector<int>(_sigma.size(), 1));
     for (int v : _terminals) {
         prev_bucket[v][0] = 0;
