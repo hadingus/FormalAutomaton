@@ -57,13 +57,13 @@ Automaton::Automaton(const std::string &sig, int _start): _edges(0), _sigma(sig)
     add_Vertex(_start);
 }
 
-Automaton::Automaton(const Automaton& other): _start(other._start), _finishes(other._finishes),
+Automaton::Automaton(const Automaton& other): _start(other._start), _terminals(other._terminals),
                                    _graph(other._graph), _edges(other._edges), _sigma(other._sigma) {}
 
 Automaton& Automaton::operator=(const Automaton& other) {
     if (this != &other) {
         _edges  = other._edges;
-        _finishes = other._finishes;
+        _terminals = other._terminals;
         _graph = other._graph;
         _edges = other._edges;
         _sigma = other._sigma;
@@ -109,25 +109,25 @@ int Automaton::get_start() const {
     return _start;
 }
 
-void Automaton::clear_finishes() {
-    _finishes.clear();
+void Automaton::clear_terminals() {
+    _terminals.clear();
 }
 
-void Automaton::add_finish(int s) {
+void Automaton::add_terminal(int s) {
     add_Vertex(s);
-    _finishes.insert(s);
+    _terminals.insert(s);
 }
 
 std::vector<int> Automaton::get_next_Vertex(int from, char c) const {
     return _graph.at(from).get_edge(c);
 }
 
-bool Automaton::is_finish(int f) const {
-    return _finishes.find(f) != _finishes.end();
+bool Automaton::is_terminal(int f) const {
+    return _terminals.find(f) != _terminals.end();
 }
 
-std::set<int> Automaton::get_finishes() const {
-    return _finishes;
+std::set<int> Automaton::get_terminals() const {
+    return _terminals;
 }
 
 Automaton::iterator Automaton::begin() {
@@ -148,7 +148,7 @@ Automaton::const_iterator Automaton::end() const {
 
 bool Automaton::_dfs(int v, const std::string &s, int pos) const {
     if (pos == s.size()) {
-        return is_finish(v);
+        return is_terminal(v);
     }
     auto next_verts = get_next_Vertex(v, s[pos]);
     bool good;
@@ -184,8 +184,8 @@ void Automaton::make_deterministic() {
 
 
         for (auto u : vert_cort) {
-            if (is_finish(u)) {
-                result.add_finish(cur_id);
+            if (is_terminal(u)) {
+                result.add_terminal(cur_id);
                 break;
             }
         }
@@ -249,15 +249,15 @@ void Automaton::make_additional() {
     make_deterministic();
     make_full();
 
-    std::vector<bool> new_finish(v_size(), 1);
-    for (int v: _finishes) {
-        new_finish[v] = 0;
+    std::vector<bool> new_terminal(v_size(), 1);
+    for (int v: _terminals) {
+        new_terminal[v] = 0;
     }
-    clear_finishes();
+    clear_terminals();
 
     for (int v = 0; v < v_size(); ++v) {
-        if (new_finish[v]) {
-            add_finish(v);
+        if (new_terminal[v]) {
+            add_terminal(v);
         }
     }
 }
@@ -273,7 +273,7 @@ void Automaton::_calc_buckets(std::vector<std::vector<int>> &t) {
 
 void Automaton::make_minimal() {
     std::vector<std::vector<int>> prev_bucket(v_size(), std::vector<int>(_sigma.size(), 1));
-    for (int v : _finishes) {
+    for (int v : _terminals) {
         prev_bucket[v][0] = 0;
     }
     _calc_buckets(prev_bucket);
@@ -306,8 +306,8 @@ void Automaton::make_minimal() {
                 char c = _sigma[i];
                 min_auto.add_edge(prev_bucket[v][0], c, prev_bucket[v][i]);
             }
-            if (is_finish(v)) {
-                min_auto.add_finish(prev_bucket[v][0]);
+            if (is_terminal(v)) {
+                min_auto.add_terminal(prev_bucket[v][0]);
             }
         }
     }
@@ -328,8 +328,8 @@ std::ostream& operator<<(std::ostream &out, const Automaton &a) {
     }
 
     out << "\nstart: " << a.get_start() << "\n";
-    auto f = a.get_finishes();
-    out << "finishes: ";
+    auto f = a.get_terminals();
+    out << ": ";
     for (auto i : f) {
         out << i << " ";
     }
@@ -351,10 +351,10 @@ std::istream& operator>>(std::istream &in, Automaton& a) {
     in >> to;
     a.set_start(to);
     in >> n;
-    a.clear_finishes();
+    a.clear_terminals();
     while (n--) {
         in >> to;
-        a.add_finish(to);
+        a.add_terminal(to);
     }
 
     return in;
@@ -400,7 +400,7 @@ bool Automaton::is_same(Automaton other) const {
         q.pop();
 
         int u = cur.first, v = cur.second;
-        if (a.is_finish(u) && other.is_finish(v)) {
+        if (a.is_terminal(u) && other.is_terminal(v)) {
             return false;
         }
         for (int i = 1; i < _sigma.size(); ++i) {
