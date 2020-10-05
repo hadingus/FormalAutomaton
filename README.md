@@ -19,6 +19,8 @@ Automat inputs in the following way:
 
 ## Launching:
 
+cd automaton
+
 mkdir build
 
 cd build
@@ -28,7 +30,9 @@ cmake ../ && make && ./MainExe
 
 -----------------------------------------------
 
-## Lauching tests:
+## Launching tests:
+
+cd automaton
 
 mkdir build
 
