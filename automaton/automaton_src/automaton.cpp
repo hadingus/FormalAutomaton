@@ -2,6 +2,7 @@
 // Created by Евгений Тищенко on 04.10.2020.
 //
 
+
 #include "automaton.h"
 
 Vertex::Vertex() = default;
@@ -436,7 +437,7 @@ std::istream& operator>>(std::istream &in, Automaton& a) {
     std::string sig;
     in >> sig;
     a._sigma = sig;
-    size_t n;
+    int n;
     in >> n;
     int from, to;
     char c;

@@ -11,6 +11,7 @@
 #include <vector>
 #include <set>
 #include <queue>
+#include <string>
 
 class Vertex {
 private:
