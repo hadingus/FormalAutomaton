@@ -43,7 +43,7 @@ public:
 };
 
 class Automaton {
-    std::string _sigma;
+    std::string _alphabet;
     int _start;
     size_t _edges;
     std::set<int> _terminals;
@@ -70,7 +70,7 @@ public:
 
     std::set<int> get_terminals() const;
     int get_start() const;
-    std::string get_sigma() const;
+    std::string get_alphabet() const;
     std::vector<int> get_next_vertex(int from, char c) const;
 
     size_t v_size() const;

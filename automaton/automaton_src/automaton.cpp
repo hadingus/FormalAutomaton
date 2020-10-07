@@ -69,12 +69,12 @@ Vertex::const_iterator Vertex::end() const {
 }
 
 Automaton::Automaton(): _edges(0), _start(-1) {}
-Automaton::Automaton(const std::string &sig, int _start): _edges(0), _sigma(sig), _start(_start) {
+Automaton::Automaton(const std::string &sig, int _start): _edges(0), _alphabet(sig), _start(_start) {
     add_vertex(_start);
 }
 
 Automaton::Automaton(const Automaton& other): _start(other._start), _terminals(other._terminals),
-                                   _graph(other._graph), _edges(other._edges), _sigma(other._sigma) {}
+                                   _graph(other._graph), _edges(other._edges), _alphabet(other._alphabet) {}
 
 Automaton& Automaton::operator=(const Automaton& other) {
     if (this != &other) {
@@ -82,7 +82,7 @@ Automaton& Automaton::operator=(const Automaton& other) {
         _terminals = other._terminals;
         _graph = other._graph;
         _edges = other._edges;
-        _sigma = other._sigma;
+        _alphabet = other._alphabet;
     }
     return *this;
 }
@@ -105,8 +105,8 @@ void Automaton::delete_edge(int from, char c, int to) {
     _graph[from].delete_edge(c, to);
 }
 
-std::string Automaton::get_sigma() const {
-    return _sigma;
+std::string Automaton::get_alphabet() const {
+    return _alphabet;
 }
 
 size_t Automaton::v_size() const {
@@ -202,7 +202,7 @@ void Automaton::_eps_dfs(int v, std::vector<int> &result, std::map<int, bool> &u
 
 void Automaton::_reformat_dfs(int v, std::map<int, bool> &used) const {
     used[v] = true;
-    for (auto c: _sigma) {
+    for (auto c: _alphabet) {
         auto next = get_next_vertex(v, c);
         for (int u : next) {
             if (used.find(u) == used.end()) {
@@ -215,11 +215,10 @@ void Automaton::_reformat_dfs(int v, std::map<int, bool> &used) const {
 void Automaton::_reformat() {
     std::map<int, bool> used;
     _reformat_dfs(_start, used);
-    int sz = v_size();
-    for (int v = 0; v < sz; ++v) {
+    for (int v = 0; v < v_size(); ++v) {
         if (!used[v] && _graph.find(v) != _graph.end()) {
             int deleted_cnt = 0;
-            for (char c : _sigma) {
+            for (char c : _alphabet) {
                 deleted_cnt += _graph[v].get_next_count(c);
             }
             _edges -= deleted_cnt;
@@ -233,33 +232,34 @@ bool Automaton::has_word(const std::string &s) const {
 }
 
 void Automaton::make_deterministic() {
-    std::queue<std::vector<int>> q;
+    std::queue<std::vector<int>> vertex_queue;
     std::map<std::vector<int>, int> new_id;
     int id = 0;
     std::map<std::vector<int>, bool> used;
 
-    Automaton result(get_sigma(), 0);
+    Automaton result(get_alphabet(), 0);
 
-    q.push({_start});
-    new_id[{_start}] = id++;
-    used[{_start}] = true;
+    std::vector<int> base_vertex = {_start};
+    vertex_queue.push(base_vertex);
+    new_id[base_vertex] = id;
+    used[base_vertex] = true;
+    id++;
 
-    while (!q.empty()) {
-        std::vector<int> vert_cort = q.front();
-        q.pop();
-        int cur_id = new_id[vert_cort];
+    while (!vertex_queue.empty()) {
+        std::vector<int> current_vertex = vertex_queue.front(); //all these vertices will be the one
+        vertex_queue.pop();
+        int cur_id = new_id[current_vertex];
 
-
-        for (auto u : vert_cort) {
+        for (auto u : current_vertex) {
             if (is_terminal(u)) {
                 result.add_terminal(cur_id);
                 break;
             }
         }
 
-        for (auto c : get_sigma()) {
+        for (auto c : get_alphabet()) {
             std::set<int> nxt_set;
-            for (auto v : vert_cort) {
+            for (auto v : current_vertex) {
                 auto next_verts = get_next_vertex(v, c);
                 for (auto it : next_verts) {
                     nxt_set.insert(it);
@@ -274,7 +274,7 @@ void Automaton::make_deterministic() {
 
             if (!next_vert.empty()) {
                 if (used.find(next_vert) == used.end()) {
-                    q.push(next_vert);
+                    vertex_queue.push(next_vert);
                     used[next_vert] = true;
                     new_id[next_vert] = id++;
                 }
@@ -295,8 +295,8 @@ void Automaton::make_complete() {
     add_vertex(sz);
     for (const auto& it : _graph) {
         int v = it.first;
-        for (int i = 1; i < _sigma.size(); ++i) {
-            char c = _sigma[i];
+        for (int i = 1; i < _alphabet.size(); ++i) {
+            char c = _alphabet[i];
             auto connected_vertices = get_next_vertex(v, c);
             if (connected_vertices.empty()) {
                 add_edge(v, c, sz);
@@ -330,8 +330,8 @@ void Automaton::make_complement() {
 }
 
 void Automaton::_calc_buckets(std::vector<std::vector<int>> &t) {
-    for (int i = 1; i < _sigma.size(); ++i) {
-        char c = _sigma[i];
+    for (int i = 1; i < _alphabet.size(); ++i) {
+        char c = _alphabet[i];
         for (int v = 0; v < v_size(); ++v) {
             t[v][i] = t[get_next_vertex(v, c)[0]][0];
         }
@@ -348,8 +348,8 @@ void Automaton::delete_eps() {
     for (int v = 0; v < v_size(); ++v) {
 
         for (int u : new_connections[v]) {
-            for (int i = 1; i < _sigma.size(); ++i) {
-                char c = _sigma[i];
+            for (int i = 1; i < _alphabet.size(); ++i) {
+                char c = _alphabet[i];
                 auto new_vrts = get_next_vertex(u, c);
                 for (int w : new_vrts) {
                     add_edge(v, c, w);
@@ -369,7 +369,7 @@ void Automaton::delete_eps() {
 
 void Automaton::make_minimal() {
     make_complete();
-    std::vector<std::vector<int>> prev_bucket(v_size(), std::vector<int>(_sigma.size(), 1));
+    std::vector<std::vector<int>> prev_bucket(v_size(), std::vector<int>(_alphabet.size(), 1));
     for (int v : _terminals) {
         prev_bucket[v][0] = 0;
     }
@@ -377,7 +377,7 @@ void Automaton::make_minimal() {
     int id;
     for (int iter = 0; iter < v_size(); ++iter) {
         id = 0;
-        std::vector<std::vector<int>> next_bucket(v_size(), std::vector<int>(_sigma.size(), -1));
+        std::vector<std::vector<int>> next_bucket(v_size(), std::vector<int>(_alphabet.size(), -1));
         for (int v = 0; v < v_size(); ++v) {
             if (next_bucket[v][0] == -1) {
                 auto temp = prev_bucket[v];
@@ -394,13 +394,13 @@ void Automaton::make_minimal() {
         _calc_buckets(prev_bucket);
     }
 
-    Automaton min_auto(_sigma, prev_bucket[0][0]);
+    Automaton min_auto(_alphabet, prev_bucket[0][0]);
     std::vector<bool> used(id, false);
     for (int v = 0; v < v_size(); ++v) {
         if (!(used[prev_bucket[v][0]])) {
             used[prev_bucket[v][0]] = true;
-            for (int i = 1; i < _sigma.size(); ++i) {
-                char c = _sigma[i];
+            for (int i = 1; i < _alphabet.size(); ++i) {
+                char c = _alphabet[i];
                 min_auto.add_edge(prev_bucket[v][0], c, prev_bucket[v][i]);
             }
             if (is_terminal(v)) {
@@ -434,22 +434,19 @@ std::ostream& operator<<(std::ostream &out, const Automaton &a) {
 }
 
 std::istream& operator>>(std::istream &in, Automaton& a) {
-    std::string sig;
-    in >> sig;
-    a._sigma = sig;
-    int n;
-    in >> n;
+    in >> a._alphabet;
+    int edges_count, terminals_count;
+    in >> edges_count;
     int from, to;
     char c;
-    while (n--) {
+    while (edges_count--) {
         in >> from >> c >> to;
         a.add_edge(from, c, to);
     }
-    in >> to;
-    a.set_start(to);
-    in >> n;
+    in >> a._start;
+    in >> terminals_count;
     a.clear_terminals();
-    while (n--) {
+    while (terminals_count--) {
         in >> to;
         a.add_terminal(to);
     }
@@ -477,14 +474,27 @@ std::ostream& operator<<(std::ostream &out, const Vertex& v) {
 }
 
 bool Automaton::is_same(Automaton other) const {
+    struct vertex_pair {
+        int vertex1, vertex2;
+        vertex_pair(int v1, int v2): vertex1(v1), vertex2(v2) {}
+        vertex_pair() = default;
+
+        bool operator<(const vertex_pair& other) const {
+            if (vertex1 != other.vertex1) {
+                return vertex1 < other.vertex1;
+            }
+            return vertex2 < other.vertex2;
+        }
+    };
+
     Automaton a = (*this);
     a.make_minimal();
 
     other.make_minimal();
     other.make_complement();
 
-    std::map<std::pair<int, int>, bool> used;
-    std::queue<std::pair<int, int>> q;
+    std::map<vertex_pair, bool> used;
+    std::queue<vertex_pair> q;
     q.push({a.get_start(), other.get_start()});
     used[{a.get_start(), other.get_start()}] = true;
 
@@ -492,17 +502,17 @@ bool Automaton::is_same(Automaton other) const {
         auto cur = q.front();
         q.pop();
 
-        int u = cur.first, v = cur.second;
+        int u = cur.vertex1, v = cur.vertex2;
         if (a.is_terminal(u) && other.is_terminal(v)) {
             return false;
         }
-        for (int i = 1; i < _sigma.size(); ++i) {
-            char c = _sigma[i];
+        for (int i = 1; i < _alphabet.size(); ++i) {
+            char c = _alphabet[i];
             int u1 = a.get_next_vertex(u, c)[0];
             int v1 = other.get_next_vertex(v, c)[0];
             if (used.find({u1, v1}) == used.end()) {
                 used[{u1, v1}] = true;
-                q.push({u1, v1});
+                q.push(vertex_pair(u1, v1));
             }
         }
     }

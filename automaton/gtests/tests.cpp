@@ -28,9 +28,9 @@ TEST(VertexTest, SimpleTest) {
 
 }
 
-TEST(AutomatonTest, SigmaTest) {
+TEST(AutomatonTest, AlphabetTest) {
     Automaton a("1abc", 0);
-    EXPECT_EQ(a.get_sigma(), "1abc");
+    EXPECT_EQ(a.get_alphabet(), "1abc");
 }
 
 TEST(AutomatonTest, AddingVertices) {
