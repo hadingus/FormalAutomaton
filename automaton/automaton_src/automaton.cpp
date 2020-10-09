@@ -202,11 +202,10 @@ void Automaton::_eps_dfs(int v, std::vector<int> &result, std::map<int, bool> &u
 
 void Automaton::_reformat_dfs(int v, std::map<int, bool> &used) const {
     used[v] = true;
-    for (auto c: _alphabet) {
-        auto next = get_next_vertex(v, c);
-        for (int u : next) {
-            if (used.find(u) == used.end()) {
-                _reformat_dfs(u, used);
+    for (auto symbol: _alphabet) {
+        for (int next_vertex : get_next_vertex(v, symbol)) {
+            if (used.find(next_vertex) == used.end()) {
+                _reformat_dfs(next_vertex, used);
             }
         }
     }
@@ -491,7 +490,6 @@ bool Automaton::is_same(Automaton other) const {
     a.make_minimal();
 
     other.make_minimal();
-    other.make_complement();
 
     std::map<vertex_pair, bool> used;
     std::queue<vertex_pair> q;
@@ -503,7 +501,7 @@ bool Automaton::is_same(Automaton other) const {
         q.pop();
 
         int u = cur.vertex1, v = cur.vertex2;
-        if (a.is_terminal(u) && other.is_terminal(v)) {
+        if (a.is_terminal(u) ^ other.is_terminal(v)) {
             return false;
         }
         for (int i = 1; i < _alphabet.size(); ++i) {

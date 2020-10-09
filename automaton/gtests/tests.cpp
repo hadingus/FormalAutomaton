@@ -333,6 +333,21 @@ TEST(AutomatonTest, CheckEqualutyTest2) {
     EXPECT_EQ(a.is_same(b), false);
 }
 
+TEST(AutomatonTest, CheckEqualutyTest3) {
+    Automaton a("1ab", 0), b("1ab", 0);
+
+    a.add_edge(0, 'a', 0);
+    a.add_edge(0, 'b', 1);
+
+    b.add_edge(0, 'a', 1);
+    b.add_edge(0, 'b', 1);
+    b.add_edge(1, 'a', 1);
+    b.add_edge(1, 'b', 1);
+
+    b.add_terminal(1);
+    EXPECT_EQ(a.is_same(b), false);
+}
+
 TEST(AutomatonTest, CheckDeletingEpsTest1) {
     Automaton a("1abc", 0), b("1abc", 2);
     a.add_edge(0, 'a', 0);
@@ -438,3 +453,5 @@ TEST(AutomatonTest, CheckDeletingEpsTest3) {
 
     EXPECT_EQ(b.is_same(a), true);
 }
+
+
